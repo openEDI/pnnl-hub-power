@@ -31,10 +31,10 @@ def kubernetes_service():
 def build_url(host: str, port: int, enpoint: list):
 
     if kubernetes_service():
-        logging.info("Containers running in docker-compose environment")
+        logging.info("Containers running in kubernetes environment")
         url = f"http://{host}.{kubernetes_service()}:{port}/"
     else:
-        logging.info("Containers running in kubernetes environment")
+        logging.info("Containers running in docker-compose environment")
         url = f"http://{host}:{port}/"
     url = url + "/".join(enpoint)
     logging.info(f"Built url {url}")
