@@ -199,13 +199,13 @@ def _make_mock_sub(is_updated=False, json_val=None):
 def _powers_real_dict(ids, equipment_ids, values, time=0):
     """Build a PowersReal and return it as a plain dict (mimicking HELICS .json)."""
     p = PowersReal(ids=ids, equipment_ids=equipment_ids, values=values, time=time)
-    return json.loads(p.json())
+    return json.loads(p.model_dump_json())
 
 
 def _powers_imag_dict(ids, equipment_ids, values, time=0):
     """Build a PowersImaginary and return it as a plain dict."""
     q = PowersImaginary(ids=ids, equipment_ids=equipment_ids, values=values, time=time)
-    return json.loads(q.json())
+    return json.loads(q.model_dump_json())
 
 
 def _make_hub():

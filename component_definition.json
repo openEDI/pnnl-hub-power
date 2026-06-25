@@ -1,6 +1,6 @@
 {
     "directory": "hub_power",
-    "execute_function": "python hub_federate.py",
+    "execute_function": "python -m src.pnnl-hub-power.hub_federate",
     "static_inputs": [
         {
             "type": "",

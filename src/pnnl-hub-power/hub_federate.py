@@ -88,24 +88,24 @@ class HubFederate(object):
         self.register_publication()
 
     def load_component_definition(self) -> None:
-        path = Path(__file__).parent / "component_definition.json"
+        path = Path("component_definition.json")
         with open(path, "r", encoding="UTF-8") as file:
             self.component_config = json.load(file)
 
     def load_input_mapping(self):
-        path = Path(__file__).parent / "input_mapping.json"
+        path = Path("input_mapping.json")
         with open(path, "r", encoding="UTF-8") as file:
             self.inputs = json.load(file)
 
     def load_static_inputs(self):
         self.static = StaticConfig()
-        path = Path(__file__).parent / "static_inputs.json"
+        path = Path("static_inputs.json")
         with open(path, "r", encoding="UTF-8") as file:
             config = json.load(file)
 
         self.static.name = config["name"]
         self.static.max_itr = config["max_itr"]
-        self.static.t_steps = config["number_of_timesteps"]
+        self.static.t_steps = config.get("number_of_timesteps", config.get("t_steps"))
 
     def initilize(self, broker_config) -> None:
         self.info = h.helicsCreateFederateInfo()
@@ -171,7 +171,7 @@ class HubFederate(object):
         all_q = PowersImaginary(ids=[], equipment_ids=[], values=[], time=0)
         if self.sub.q0.is_updated():
             logger.debug("area 1 uqdated")
-            q = PowersImaginary.parse_obj(self.sub.q0.json)
+            q = PowersImaginary.model_validate(self.sub.q0.json)
             all_q.time = q.time
             all_q.values += q.values
             all_q.ids += q.ids
@@ -179,7 +179,7 @@ class HubFederate(object):
 
         if self.sub.q1.is_updated():
             logger.debug("area 2 uqdated")
-            q = PowersImaginary.parse_obj(self.sub.q1.json)
+            q = PowersImaginary.model_validate(self.sub.q1.json)
             all_q.time = q.time
             all_q.values += q.values
             all_q.ids += q.ids
@@ -187,7 +187,7 @@ class HubFederate(object):
 
         if self.sub.q2.is_updated():
             logger.debug("area 3 uqdated")
-            q = PowersImaginary.parse_obj(self.sub.q2.json)
+            q = PowersImaginary.model_validate(self.sub.q2.json)
             all_q.time = q.time
             all_q.values += q.values
             all_q.ids += q.ids
@@ -195,7 +195,7 @@ class HubFederate(object):
 
         if self.sub.q3.is_updated():
             logger.debug("area 4 uqdated")
-            q = PowersImaginary.parse_obj(self.sub.q3.json)
+            q = PowersImaginary.model_validate(self.sub.q3.json)
             all_q.time = q.time
             all_q.values += q.values
             all_q.ids += q.ids
@@ -203,7 +203,7 @@ class HubFederate(object):
 
         if self.sub.q4.is_updated():
             logger.debug("area 5 uqdated")
-            q = PowersImaginary.parse_obj(self.sub.q4.json)
+            q = PowersImaginary.model_validate(self.sub.q4.json)
             all_q.time = q.time
             all_q.values += q.values
             all_q.ids += q.ids
@@ -214,13 +214,13 @@ class HubFederate(object):
             logger.debug(f"{eq} = {v}")
 
         for area in range(6):
-            self.pub_area_q[area].publish(all_q.json())
+            self.pub_area_q[area].publish(all_q.model_dump_json())
 
     def publish_real(self):
         all_p = PowersReal(ids=[], equipment_ids=[], values=[], time=0)
         if self.sub.p0.is_updated():
             logger.debug("area 1 updated")
-            p = PowersReal.parse_obj(self.sub.p0.json)
+            p = PowersReal.model_validate(self.sub.p0.json)
             all_p.time = p.time
             all_p.values += p.values
             all_p.ids += p.ids
@@ -228,7 +228,7 @@ class HubFederate(object):
 
         if self.sub.p1.is_updated():
             logger.debug("area 2 updated")
-            p = PowersReal.parse_obj(self.sub.p1.json)
+            p = PowersReal.model_validate(self.sub.p1.json)
             all_p.time = p.time
             all_p.values += p.values
             all_p.ids += p.ids
@@ -236,7 +236,7 @@ class HubFederate(object):
 
         if self.sub.p2.is_updated():
             logger.debug("area 3 updated")
-            p = PowersReal.parse_obj(self.sub.p2.json)
+            p = PowersReal.model_validate(self.sub.p2.json)
             all_p.time = p.time
             all_p.values += p.values
             all_p.ids += p.ids
@@ -244,7 +244,7 @@ class HubFederate(object):
 
         if self.sub.p3.is_updated():
             logger.debug("area 4 updated")
-            p = PowersReal.parse_obj(self.sub.p3.json)
+            p = PowersReal.model_validate(self.sub.p3.json)
             all_p.time = p.time
             all_p.values += p.values
             all_p.ids += p.ids
@@ -252,7 +252,7 @@ class HubFederate(object):
 
         if self.sub.p4.is_updated():
             logger.debug("area 5 updated")
-            p = PowersReal.parse_obj(self.sub.p4.json)
+            p = PowersReal.model_validate(self.sub.p4.json)
             all_p.time = p.time
             all_p.values += p.values
             all_p.ids += p.ids
@@ -263,7 +263,7 @@ class HubFederate(object):
             logger.debug(f"{eq} = {v}")
 
         for area in range(6):
-            self.pub_area_p[area].publish(all_p.json())
+            self.pub_area_p[area].publish(all_p.model_dump_json())
 
     def run(self) -> None:
         logger.info(f"Federate connected: {datetime.now()}")
@@ -277,7 +277,7 @@ class HubFederate(object):
         logger.debug(f"update interval: {update_interval}")
         granted_time = 0
         logger.debug("Step 0: Starting Time/Itr Loops")
-        while granted_time <= self.static.t_steps:
+        while granted_time < self.static.t_steps:
             request_time = granted_time + update_interval
             logger.debug("Step 1: published initial values for iteration")
             itr_flag = itr_need
