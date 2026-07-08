@@ -462,13 +462,13 @@ dependencies = [
 [package.metadata]
 requires-dist = [
     { name = "fastapi", specifier = ">=0.125.0" },
-    { name = "helics", specifier = ">=3.6.1" },
-    { name = "helics-apps", specifier = ">=3.6.1" },
+    { name = "helics", specifier = ">=3.4.0" },
+    { name = "helics-apps", specifier = ">=3.4.0" },
     { name = "numpy", specifier = ">=2.4.3" },
     { name = "oedisi", specifier = "~=3.0" },
     { name = "pandas", specifier = ">=3.0.1" },
     { name = "pyarrow", specifier = ">=23.0.1" },
-    { name = "pydantic", specifier = ">=1.10.26" },
+    { name = "pydantic" },
     { name = "python-multipart", specifier = ">=0.0.22" },
     { name = "uvicorn", specifier = ">=0.42.0" },
     { name = "xarray", specifier = ">=2026.2.0" },
