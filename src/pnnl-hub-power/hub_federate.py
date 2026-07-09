@@ -131,34 +131,34 @@ class HubFederate(object):
     def register_subscription(self) -> None:
         self.sub.p0 = self.fed.register_subscription(
             self.inputs["sub_p0"], ""
-        )
+        ) if self.inputs.get("sub_p0") else None
         self.sub.p1 = self.fed.register_subscription(
             self.inputs["sub_p1"], ""
-        )
+        ) if self.inputs.get("sub_p1") else None
         self.sub.p2 = self.fed.register_subscription(
             self.inputs["sub_p2"], ""
-        )
+        ) if self.inputs.get("sub_p2") else None
         self.sub.p3 = self.fed.register_subscription(
             self.inputs["sub_p3"], ""
-        )
+        ) if self.inputs.get("sub_p3") else None
         self.sub.p4 = self.fed.register_subscription(
             self.inputs["sub_p4"], ""
-        )
+        ) if self.inputs.get("sub_p4") else None
         self.sub.q0 = self.fed.register_subscription(
             self.inputs["sub_q0"], ""
-        )
+        ) if self.inputs.get("sub_q0") else None
         self.sub.q1 = self.fed.register_subscription(
             self.inputs["sub_q1"], ""
-        )
+        ) if self.inputs.get("sub_q1") else None
         self.sub.q2 = self.fed.register_subscription(
             self.inputs["sub_q2"], ""
-        )
+        ) if self.inputs.get("sub_q2") else None
         self.sub.q3 = self.fed.register_subscription(
             self.inputs["sub_q3"], ""
-        )
+        ) if self.inputs.get("sub_q3") else None
         self.sub.q4 = self.fed.register_subscription(
             self.inputs["sub_q4"], ""
-        )
+        ) if self.inputs.get("sub_q4") else None
 
     def register_publication(self) -> None:
         self.pub_area_p = []
@@ -175,7 +175,7 @@ class HubFederate(object):
 
     def publish_imag(self):
         all_q = PowersImaginary(ids=[], equipment_ids=[], values=[], time=0)
-        if self.sub.q0.is_updated():
+        if self.sub.q0 and self.sub.q0.is_updated():
             logger.debug("area 1 uqdated")
             q = PowersImaginary.model_validate(self.sub.q0.json)
             all_q.time = q.time
@@ -183,7 +183,7 @@ class HubFederate(object):
             all_q.ids += q.ids
             all_q.equipment_ids += q.equipment_ids
 
-        if self.sub.q1.is_updated():
+        if self.sub.q1 and self.sub.q1.is_updated():
             logger.debug("area 2 uqdated")
             q = PowersImaginary.model_validate(self.sub.q1.json)
             all_q.time = q.time
@@ -191,7 +191,7 @@ class HubFederate(object):
             all_q.ids += q.ids
             all_q.equipment_ids += q.equipment_ids
 
-        if self.sub.q2.is_updated():
+        if self.sub.q2 and self.sub.q2.is_updated():
             logger.debug("area 3 uqdated")
             q = PowersImaginary.model_validate(self.sub.q2.json)
             all_q.time = q.time
@@ -199,7 +199,7 @@ class HubFederate(object):
             all_q.ids += q.ids
             all_q.equipment_ids += q.equipment_ids
 
-        if self.sub.q3.is_updated():
+        if self.sub.q3 and self.sub.q3.is_updated():
             logger.debug("area 4 uqdated")
             q = PowersImaginary.model_validate(self.sub.q3.json)
             all_q.time = q.time
@@ -207,7 +207,7 @@ class HubFederate(object):
             all_q.ids += q.ids
             all_q.equipment_ids += q.equipment_ids
 
-        if self.sub.q4.is_updated():
+        if self.sub.q4 and self.sub.q4.is_updated():
             logger.debug("area 5 uqdated")
             q = PowersImaginary.model_validate(self.sub.q4.json)
             all_q.time = q.time
@@ -224,7 +224,7 @@ class HubFederate(object):
 
     def publish_real(self):
         all_p = PowersReal(ids=[], equipment_ids=[], values=[], time=0)
-        if self.sub.p0.is_updated():
+        if self.sub.p0 and self.sub.p0.is_updated():
             logger.debug("area 1 updated")
             p = PowersReal.model_validate(self.sub.p0.json)
             all_p.time = p.time
@@ -232,7 +232,7 @@ class HubFederate(object):
             all_p.ids += p.ids
             all_p.equipment_ids += p.equipment_ids
 
-        if self.sub.p1.is_updated():
+        if self.sub.p1 and self.sub.p1.is_updated():
             logger.debug("area 2 updated")
             p = PowersReal.model_validate(self.sub.p1.json)
             all_p.time = p.time
@@ -240,7 +240,7 @@ class HubFederate(object):
             all_p.ids += p.ids
             all_p.equipment_ids += p.equipment_ids
 
-        if self.sub.p2.is_updated():
+        if self.sub.p2 and self.sub.p2.is_updated():
             logger.debug("area 3 updated")
             p = PowersReal.model_validate(self.sub.p2.json)
             all_p.time = p.time
@@ -248,7 +248,7 @@ class HubFederate(object):
             all_p.ids += p.ids
             all_p.equipment_ids += p.equipment_ids
 
-        if self.sub.p3.is_updated():
+        if self.sub.p3 and self.sub.p3.is_updated():
             logger.debug("area 4 updated")
             p = PowersReal.model_validate(self.sub.p3.json)
             all_p.time = p.time
@@ -256,7 +256,7 @@ class HubFederate(object):
             all_p.ids += p.ids
             all_p.equipment_ids += p.equipment_ids
 
-        if self.sub.p4.is_updated():
+        if self.sub.p4 and self.sub.p4.is_updated():
             logger.debug("area 5 updated")
             p = PowersReal.model_validate(self.sub.p4.json)
             all_p.time = p.time
@@ -304,6 +304,7 @@ class HubFederate(object):
                 if (
                     granted_time > 0.0
                     and itr == 0
+                    and self.sub.p0
                     and not self.sub.p0.is_updated()
                 ):
                     logger.info("ADMM disconnected. Exiting loop.")

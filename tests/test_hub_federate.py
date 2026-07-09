@@ -337,3 +337,42 @@ def test_publish_imag_multiple_subscriptions_updated():
         payload = json.loads(pub.publish.call_args[0][0])
         assert payload["ids"] == ["bus1", "bus2"]
         assert payload["values"] == [3.0, 4.0]
+
+
+def test_register_subscription_partial():
+    """T21 — partial input mapping registers only mapped subscriptions."""
+    from hub_federate import HubFederate, Subscriptions, StaticConfig
+    from oedisi.types.common import BrokerConfig
+
+    # Mock helics call to value federate
+    fed_mock = MagicMock()
+    broker = BrokerConfig(broker_ip="127.0.0.1", broker_port=23404)
+
+    original_init = HubFederate.__init__
+    def patch_init(self, broker_config):
+        self.inputs = {
+            "sub_p0": "feeder0/pub_p0",
+            # sub_p1, sub_p2... and q0, q1... are missing/empty
+            "sub_q2": "feeder2/pub_q2",
+            "sub_p3": "",
+        }
+        self.sub = Subscriptions()
+        self.static = StaticConfig()
+        self.static.name = "test_hub"
+        self.static.max_itr = 5
+        self.static.t_steps = 10
+        self.fed = fed_mock
+        self.register_subscription()
+
+    HubFederate.__init__ = patch_init
+    try:
+        fed = HubFederate(broker)
+        assert fed_mock.register_subscription.call_count == 2
+        fed_mock.register_subscription.assert_any_call("feeder0/pub_p0", "")
+        fed_mock.register_subscription.assert_any_call("feeder2/pub_q2", "")
+        assert fed.sub.p0 is not None
+        assert fed.sub.p1 is None
+        assert fed.sub.q2 is not None
+        assert fed.sub.q3 is None
+    finally:
+        HubFederate.__init__ = original_init
