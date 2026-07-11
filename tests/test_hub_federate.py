@@ -217,7 +217,6 @@ def _make_hub():
     hub.static = StaticConfig()
     hub.static.name = "test_hub"
     hub.static.max_itr = 5
-    hub.static.t_steps = 10
 
     hub.pub_area_p = [MagicMock() for _ in range(6)]
     hub.pub_area_q = [MagicMock() for _ in range(6)]
@@ -360,7 +359,6 @@ def test_register_subscription_partial():
         self.static = StaticConfig()
         self.static.name = "test_hub"
         self.static.max_itr = 5
-        self.static.t_steps = 10
         self.fed = fed_mock
         self.register_subscription()
 
